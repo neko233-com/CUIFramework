@@ -108,6 +108,13 @@ typedef unsigned long long GLuint64;
 #define GL_CLAMP_TO_EDGE                  0x812F
 #define GL_CLAMP_TO_BORDER                0x812D
 
+#define GL_TEXTURE0                       0x84C0
+#define GL_TEXTURE1                       0x84C1
+#define GL_TEXTURE2                       0x84C2
+#define GL_TEXTURE3                       0x84C3
+
+#define GL_VIEWPORT                       0x0BA2
+
 #define GL_FRAMEBUFFER                    0x8D40
 #define GL_RENDERBUFFER                   0x8D41
 #define GL_FRAMEBUFFER_COMPLETE           0x8CD5
@@ -172,6 +179,7 @@ typedef void  (APIENTRY *PFNGLDISABLEPROC)(GLenum cap);
 typedef void  (APIENTRY *PFNGLSCISSORPROC)(GLint x, GLint y, GLsizei width, GLsizei height);
 typedef void  (APIENTRY *PFNGLPIXELSTOREIPROC)(GLenum pname, GLint param);
 typedef void  (APIENTRY *PFNGLREADPIXELSPROC)(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* pixels);
+typedef void  (APIENTRY *PFNGLBLENDFUNCPROC)(GLenum sfactor, GLenum dfactor);
 
 /* ----------------------------- OpenGL 1.1 ----------------------------- */
 typedef void  (APIENTRY *PFNGLBINDTEXTUREPROC)(GLenum target, GLuint texture);
@@ -274,6 +282,7 @@ typedef struct {
     PFNGLDISABLEPROC Disable;
     PFNGLSCISSORPROC Scissor;
     PFNGLPIXELSTOREIPROC PixelStorei;
+    PFNGLBLENDFUNCPROC BlendFunc;
 
     /* 1.1 */
     PFNGLBINDTEXTUREPROC BindTexture;
@@ -356,6 +365,7 @@ extern GLADgl glad_gl;
 #define glDisable           glad_gl.Disable
 #define glScissor           glad_gl.Scissor
 #define glPixelStorei       glad_gl.PixelStorei
+#define glBlendFunc         glad_gl.BlendFunc
 
 #define glBindTexture       glad_gl.BindTexture
 #define glGenTextures       glad_gl.GenTextures

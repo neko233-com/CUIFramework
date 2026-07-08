@@ -4,6 +4,8 @@
 #include <cui/layout_types.h>
 #include <vector>
 #include <cstdint>
+#include <memory>
+#include <string>
 
 namespace cui {
 

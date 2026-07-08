@@ -5,7 +5,6 @@
             "name": "windows-base",
             "hidden": true,
             "generator": "Visual Studio 17 2022",
-            "binaryDir": "${sourceDir}/build/windows-${architecture}",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON"
@@ -15,6 +14,7 @@
             "name": "win-x64-debug",
             "displayName": "Windows x64 Debug",
             "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-x64",
             "architecture": {
                 "value": "x64",
                 "strategy": "set"
@@ -27,6 +27,7 @@
             "name": "win-x64-release",
             "displayName": "Windows x64 Release",
             "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-x64",
             "architecture": {
                 "value": "x64",
                 "strategy": "set"
@@ -39,6 +40,7 @@
             "name": "win-x86-debug",
             "displayName": "Windows x86 (32-bit) Debug",
             "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-x86",
             "architecture": {
                 "value": "Win32",
                 "strategy": "set"
@@ -51,6 +53,7 @@
             "name": "win-x86-release",
             "displayName": "Windows x86 (32-bit) Release",
             "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-x86",
             "architecture": {
                 "value": "Win32",
                 "strategy": "set"
@@ -63,7 +66,6 @@
             "name": "linux-base",
             "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/linux-${architecture}",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
@@ -74,6 +76,7 @@
             "name": "linux-x64-debug",
             "displayName": "Linux x64 Debug",
             "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-x64",
             "architecture": {
                 "value": "x86_64"
             },
@@ -85,6 +88,7 @@
             "name": "linux-x64-release",
             "displayName": "Linux x64 Release",
             "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-x64",
             "architecture": {
                 "value": "x86_64"
             },
@@ -96,6 +100,7 @@
             "name": "linux-arm64-debug",
             "displayName": "Linux ARM64 Debug",
             "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-arm64",
             "architecture": {
                 "value": "aarch64"
             },
@@ -107,6 +112,7 @@
             "name": "linux-arm64-release",
             "displayName": "Linux ARM64 Release",
             "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-arm64",
             "architecture": {
                 "value": "aarch64"
             },
@@ -118,7 +124,6 @@
             "name": "macos-base",
             "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/macos-${architecture}",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
@@ -129,6 +134,7 @@
             "name": "macos-arm64-debug",
             "displayName": "macOS ARM64 Debug",
             "inherits": "macos-base",
+            "binaryDir": "${sourceDir}/build/macos-arm64",
             "architecture": {
                 "value": "arm64"
             },
@@ -140,6 +146,7 @@
             "name": "macos-arm64-release",
             "displayName": "macOS ARM64 Release",
             "inherits": "macos-base",
+            "binaryDir": "${sourceDir}/build/macos-arm64",
             "architecture": {
                 "value": "arm64"
             },
@@ -151,6 +158,7 @@
             "name": "macos-x64-debug",
             "displayName": "macOS x64 Debug",
             "inherits": "macos-base",
+            "binaryDir": "${sourceDir}/build/macos-x64",
             "architecture": {
                 "value": "x86_64"
             },
@@ -162,6 +170,7 @@
             "name": "macos-x64-release",
             "displayName": "macOS x64 Release",
             "inherits": "macos-base",
+            "binaryDir": "${sourceDir}/build/macos-x64",
             "architecture": {
                 "value": "x86_64"
             },

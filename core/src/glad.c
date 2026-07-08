@@ -4,6 +4,7 @@
  */
 
 #include <glad/glad.h>
+#include <stdio.h>
 
 GLADVersion glad_version = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 GLADgl glad_gl = {0};
@@ -32,6 +33,7 @@ int gladLoadGL(GLADloadfunc load) {
     glad_gl.Disable = (PFNGLDISABLEPROC)load_gl_func("glDisable");
     glad_gl.Scissor = (PFNGLSCISSORPROC)load_gl_func("glScissor");
     glad_gl.PixelStorei = (PFNGLPIXELSTOREIPROC)load_gl_func("glPixelStorei");
+    glad_gl.BlendFunc = (PFNGLBLENDFUNCPROC)load_gl_func("glBlendFunc");
 
     /* 1.1 */
     glad_gl.BindTexture = (PFNGLBINDTEXTUREPROC)load_gl_func("glBindTexture");

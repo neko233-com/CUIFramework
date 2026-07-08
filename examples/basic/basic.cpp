@@ -1,6 +1,5 @@
-// examples/basic/basic.cpp — Minimal CUIFramework example
+// examples/basic/basic.cpp
 #include <cui/app.h>
-#include <cui/renderer.h>
 #include <cui/ui/builder.h>
 #include <cstdio>
 
@@ -11,53 +10,31 @@ int main() {
     config.height = 720;
 
     return cui::run_app(config,
-        // Setup
         [](cui::App& app) {
             std::printf("CUIFramework Basic Example started!\n");
         },
-        // Update
-        [](cui::App& app, float dt) {
-            // Handle input here
-        },
-        // Render
+        [](cui::App& app, float dt) {},
         [](cui::App& app) {
             auto& renderer = app.renderer();
+            auto& input = app.input();
             auto& window = app.window();
 
-            // Background
-            renderer.draw_rect({0, 0, (float)window.width(), (float)window.height()},
-                             cui::Colors::Background);
+            renderer.draw_rect({0, 0, (float)window.width(), (float)window.height()}, cui::Colors::Background);
+            renderer.draw_text("CUIFramework - Basic Example", 50, 50, 28, cui::Colors::White);
 
-            // Title
-            renderer.draw_text("CUIFramework - Basic Example",
-                            50, 50, 28, cui::Colors::White);
-
-            // Declarative UI
-            cui::ui::Builder builder(renderer,
-                                    (float)window.width(),
-                                    (float)window.height());
-
+            cui::ui::Builder builder(renderer, input, (float)window.width(), (float)window.height());
             builder.begin("root", cui::FlexDirection::Column, 16, cui::Padding(32));
             {
                 builder.text("Welcome to CUIFramework!", 20);
-
-                if (builder.button("Click Me")) {
-                    std::printf("Button clicked!\n");
-                }
-
+                if (builder.button("Click Me")) std::printf("Button clicked!\n");
                 static float slider_val = 0.5f;
                 builder.slider("Opacity", &slider_val, 0.0f, 1.0f);
-
                 static bool checked = false;
                 builder.checkbox("Enable Feature", &checked);
-
                 builder.separator();
-
                 builder.text("This is a simple UI example.", 14);
             }
             builder.end();
-
-            // Render all UI commands
             builder.render_all(renderer);
         }
     );
