@@ -1,60 +1,41 @@
+#define CR_HOST
+#include <cr.h>
 #include <cui/hot_reload.h>
-#include <thread>
+#include <cstdio>
 
 namespace cui {
 
-// ============================================================================
-// HotReload::Impl implementation
-// ============================================================================
+struct HotReload::Impl {
+    cr_plugin ctx;
+    HotReloadConfig config;
+    bool loaded = false;
+    int reload_count = 0;
 
-bool HotReload::Impl::load_dll() {
-    unload_dll();
-
-#ifdef _WIN32
-    dll_handle = LoadLibraryA(config.guest_dll_path.c_str());
-    if (!dll_handle) return false;
-#else
-    dll_handle = dlopen(config.guest_dll_path.c_str(), RTLD_NOW | RTLD_LOCAL);
-    if (!dll_handle) return false;
-#endif
-
-    loaded = true;
-    reload_count++;
-    return true;
-}
-
-void HotReload::Impl::unload_dll() {
-    if (dll_handle) {
-#ifdef _WIN32
-        FreeLibrary(dll_handle);
-#else
-        dlclose(dll_handle);
-#endif
-        dll_handle = nullptr;
-        loaded = false;
-    }
-}
-
-bool HotReload::Impl::check_for_changes() {
-    if (config.guest_dll_path.empty()) return false;
-
-    std::error_code ec;
-    auto current_time = std::filesystem::last_write_time(config.guest_dll_path, ec);
-    if (ec) return false;
-
-    if (last_write_time != std::filesystem::file_time_type{}) {
-        if (current_time > last_write_time) {
-            last_write_time = current_time;
+    bool open(const std::string& path) {
+        config.guest_dll_path = path;
+        if (cr_plugin_open(ctx, path.c_str())) {
+            loaded = true;
+            reload_count++;
+            std::printf("[HotReload] Plugin loaded: %s\n", path.c_str());
             return true;
         }
+        std::printf("[HotReload] Failed to load: %s\n", path.c_str());
+        return false;
     }
-    last_write_time = current_time;
-    return false;
-}
 
-// ============================================================================
-// HotReload public API
-// ============================================================================
+    void close() {
+        if (loaded) {
+            cr_plugin_close(ctx);
+            loaded = false;
+        }
+    }
+
+    bool update() {
+        if (!loaded) return false;
+        int result = cr_plugin_update(ctx);
+        return result == 0;
+    }
+};
 
 HotReload::HotReload() : impl_(std::make_unique<Impl>()) {}
 HotReload::~HotReload() { shutdown(); }
@@ -62,36 +43,21 @@ HotReload::~HotReload() { shutdown(); }
 bool HotReload::init(const HotReloadConfig& config) {
     impl_->config = config;
     if (!config.guest_dll_path.empty()) {
-        return impl_->load_dll();
+        return impl_->open(config.guest_dll_path);
     }
     return true;
 }
 
 void HotReload::shutdown() {
-    if (impl_->on_shutdown) impl_->on_shutdown();
-    impl_->unload_dll();
+    impl_->close();
 }
 
 bool HotReload::update(float delta_time) {
-    if (impl_->check_for_changes()) {
-        impl_->unload_dll();
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        if (!impl_->load_dll()) {
-            return false;
-        }
-        if (impl_->on_init) impl_->on_init();
-    }
-
-    if (impl_->on_update) {
-        return impl_->on_update(delta_time);
-    }
-    return true;
+    return impl_->update();
 }
 
-void HotReload::set_callbacks(OnInitFunc on_init, OnUpdateFunc on_update, OnShutdownFunc on_shutdown) {
-    impl_->on_init = std::move(on_init);
-    impl_->on_update = std::move(on_update);
-    impl_->on_shutdown = std::move(on_shutdown);
+void HotReload::set_callbacks(OnInitFunc, OnUpdateFunc, OnShutdownFunc) {
+    // cr.h handles callbacks via cr_main
 }
 
 bool HotReload::is_loaded() const { return impl_->loaded; }

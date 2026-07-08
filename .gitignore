@@ -34,9 +34,8 @@ CMakePresets.user.json
 .DS_Store
 Thumbs.db
 
-# Dependencies
+# Dependencies (SDL2 fetched via CMake FetchContent)
 extern/sdl2/
-extern/cr/
 
 # Package artifacts
 *.deb

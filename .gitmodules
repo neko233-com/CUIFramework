@@ -1,0 +1,3 @@
+[submodule "extern/cr"]
+	path = extern/cr
+	url = https://github.com/fungos/cr.git

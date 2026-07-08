@@ -6,6 +6,7 @@ add_library(cui_guest SHARED
 
 target_include_directories(cui_guest PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/extern/cr/cr
 )
 
 target_link_libraries(cui_guest PRIVATE

@@ -17,6 +17,7 @@ add_library(cui_core STATIC
 
 target_include_directories(cui_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/extern/cr/cr
 )
 
 target_link_libraries(cui_core PUBLIC

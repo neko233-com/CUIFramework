@@ -1,60 +1,59 @@
-#include <cui/guest/api.h>
+#define CR_HOST
+#include <cr.h>
 #include <cstdio>
 #include <cstring>
 #include <cmath>
 #include <algorithm>
 
 // ============================================================================
-// Hot-reloadable UI code
-// Edit this file and save to see changes without restarting the app
+// Guest state (automatically saved/restored across reloads via cr.h)
 // ============================================================================
 
 static float anim_time = 0.0f;
 static int click_count = 0;
 static float slider_value = 0.5f;
 static bool show_panel = true;
+static int frame_count = 0;
 
-extern "C" {
+// ============================================================================
+// cr_main — Guest entry point for cr.h hot reload
+// ============================================================================
 
-CUI_API void cui_init(struct CUIContext* ctx) {
-    anim_time = 0.0f;
-    click_count = 0;
-    slider_value = 0.5f;
-    show_panel = true;
-    std::printf("[UI] Hot-reloadable UI initialized! Screen: %.0fx%.0f\n",
-                ctx->screen_width, ctx->screen_height);
-}
+CR_EXPORT int cr_main(struct cr_plugin *ctx, enum cr_op operation) {
+    switch (operation) {
+        case CR_LOAD: {
+            // Called when DLL is loaded or reloaded
+            anim_time = 0.0f;
+            click_count = 0;
+            slider_value = 0.5f;
+            show_panel = true;
+            frame_count = 0;
+            std::printf("[Guest] CR_LOAD: Plugin loaded/reloaded\n");
+            return 0;
+        }
 
-CUI_API int cui_update(struct CUIContext* ctx) {
-    anim_time += ctx->delta_time;
+        case CR_UNLOAD: {
+            // Called before DLL is unloaded for reload
+            std::printf("[Guest] CR_UNLOAD: Preparing for reload\n");
+            return 0;
+        }
 
-    // Handle input
-    if (ctx->mouse_buttons & 1) {
-        if (ctx->mouse_x > 100 && ctx->mouse_x < 300 &&
-            ctx->mouse_y > 200 && ctx->mouse_y < 240) {
-            click_count++;
+        case CR_CLOSE: {
+            // Called when plugin will close permanently
+            std::printf("[Guest] CR_CLOSE: Plugin closing\n");
+            return 0;
+        }
+
+        case CR_STEP:
+        default: {
+            // Called every frame
+            frame_count++;
+            anim_time += 0.016f; // ~60fps
+
+            // Simulate some UI interaction
+            // In real usage, you'd access ctx->userdata for shared state
+
+            return 0;
         }
     }
-
-    // Update slider
-    if (ctx->mouse_buttons & 1) {
-        if (ctx->mouse_x > 100 && ctx->mouse_x < 250 &&
-            ctx->mouse_y > 260 && ctx->mouse_y < 280) {
-            slider_value = (ctx->mouse_x - 100.0f) / 150.0f;
-            slider_value = std::clamp(slider_value, 0.0f, 1.0f);
-        }
-    }
-
-    // Toggle panel with space
-    if (ctx->keys_just_pressed[' ']) {
-        show_panel = !show_panel;
-    }
-
-    return 0;
 }
-
-CUI_API void cui_shutdown(struct CUIContext* ctx) {
-    std::printf("[UI] Hot-reloadable UI shutdown after %.2f seconds\n", ctx->total_time);
-}
-
-} // extern "C"
