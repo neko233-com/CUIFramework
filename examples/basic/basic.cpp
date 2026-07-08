@@ -37,19 +37,28 @@ int main() {
                                     (float)window.width(),
                                     (float)window.height());
 
-            builder.begin_layout(cui::FlexDirection::Column, 16, cui::Padding(32));
+            builder.begin("root", cui::FlexDirection::Column, 16, cui::Padding(32));
             {
-                builder.text("Welcome to CUIFramework!", 20, cui::Colors::Accent);
+                builder.text("Welcome to CUIFramework!", 20);
 
-                builder.button("Click Me", cui::Colors::Accent);
+                if (builder.button("Click Me")) {
+                    std::printf("Button clicked!\n");
+                }
 
-                float slider_val = 0.5f;
+                static float slider_val = 0.5f;
                 builder.slider("Opacity", &slider_val, 0.0f, 1.0f);
 
-                bool checked = false;
+                static bool checked = false;
                 builder.checkbox("Enable Feature", &checked);
+
+                builder.separator();
+
+                builder.text("This is a simple UI example.", 14);
             }
-            builder.end_layout();
+            builder.end();
+
+            // Render all UI commands
+            builder.render_all(renderer);
         }
     );
 }
