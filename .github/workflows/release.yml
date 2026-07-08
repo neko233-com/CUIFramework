@@ -13,12 +13,15 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        preset: [win-x64-release, win-x86-release]
+        preset: [win-x64-release]
     
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Install Ninja
+        run: choco install ninja -y
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.preset }}
@@ -28,13 +31,13 @@ jobs:
 
       - name: Package
         run: |
-          cd build/windows-*/bin/Release
-          7z a -tzip ../../../CUIFramework-${{ matrix.preset }}.zip *.exe *.dll
+          cd build/windows-x64/bin/Release
+          7z a -tzip ../../../CUIFramework-windows-x64.zip *.exe *.dll
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cui-${{ matrix.preset }}
+          name: cui-windows-x64
           path: build/CUIFramework-*.zip
 
   build-linux:
@@ -54,7 +57,7 @@ jobs:
           sudo apt-get install -y build-essential \
             libgl1-mesa-dev libglu1-mesa-dev libx11-dev libxext-dev \
             libxrandr-dev libxcursor-dev libxi-dev libasound2-dev \
-            libpulse-dev pkg-config
+            libpulse-dev pkg-config libfreetype-dev
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.preset }}
@@ -85,7 +88,7 @@ jobs:
           submodules: recursive
 
       - name: Install dependencies
-        run: brew install pkg-config
+        run: brew install pkg-config freetype
 
       - name: Configure CMake
         run: cmake --preset ${{ matrix.preset }}

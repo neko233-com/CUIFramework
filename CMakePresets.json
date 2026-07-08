@@ -4,7 +4,7 @@
         {
             "name": "windows-base",
             "hidden": true,
-            "generator": "Visual Studio 17 2022",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON"
@@ -15,7 +15,6 @@
             "displayName": "Windows x64 Debug",
             "inherits": "windows-base",
             "binaryDir": "${sourceDir}/build/windows-x64",
-            "architecture": { "value": "x64", "strategy": "set" },
             "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
         },
         {
@@ -23,7 +22,6 @@
             "displayName": "Windows x64 Release",
             "inherits": "windows-base",
             "binaryDir": "${sourceDir}/build/windows-x64",
-            "architecture": { "value": "x64", "strategy": "set" },
             "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
         },
         {
@@ -31,7 +29,6 @@
             "displayName": "Windows x86 Debug",
             "inherits": "windows-base",
             "binaryDir": "${sourceDir}/build/windows-x86",
-            "architecture": { "value": "Win32", "strategy": "set" },
             "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
         },
         {
@@ -39,7 +36,6 @@
             "displayName": "Windows x86 Release",
             "inherits": "windows-base",
             "binaryDir": "${sourceDir}/build/windows-x86",
-            "architecture": { "value": "Win32", "strategy": "set" },
             "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
         },
         {
