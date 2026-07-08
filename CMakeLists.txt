@@ -89,6 +89,17 @@ set(SDL_SHARED ON CACHE BOOL "Build SDL2 as shared library" FORCE)
 set(SDL_STATIC OFF CACHE BOOL "Build SDL2 as static library" FORCE)
 FetchContent_MakeAvailable(SDL2)
 
+# SDL2_ttf for font rendering
+FetchContent_Declare(SDL2_ttf
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+    GIT_TAG release-2.24.x
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+)
+set(SDL2TTF_SHARED ON CACHE BOOL "Build SDL2_ttf as shared library" FORCE)
+set(SDL2TTF_STATIC OFF CACHE BOOL "Build SDL2_ttf as static library" FORCE)
+FetchContent_MakeAvailable(SDL2_ttf)
+
 # GLAD (OpenGL loader) — header-only, we include it directly
 # We'll generate the glad.c file or use a pre-built one
 

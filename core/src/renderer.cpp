@@ -1,6 +1,7 @@
 #include <cui/renderer.h>
 #include <glad/glad.h>
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -137,10 +138,31 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+        // Initialize SDL_ttf for font rendering
+        if (TTF_Init() == -1) {
+            std::printf("Warning: SDL_ttf initialization failed: %s\n", TTF_GetError());
+        } else {
+            // Try to load a system font
+            font_ = TTF_OpenFont("C:/Windows/Fonts/arial.ttf", 16);
+            if (!font_) {
+                font_ = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 16);
+            }
+            if (!font_) {
+                std::printf("Warning: Could not load font, using fallback\n");
+            } else {
+                std::printf("Font loaded successfully\n");
+            }
+        }
+
         return true;
     }
 
     void shutdown() {
+        if (font_) {
+            TTF_CloseFont(font_);
+            font_ = nullptr;
+        }
+        TTF_Quit();
         if (white_texture_) glDeleteTextures(1, &white_texture_);
         if (vbo_) glDeleteBuffers(1, &vbo_);
         if (vao_) glDeleteVertexArrays(1, &vao_);
@@ -197,22 +219,82 @@ public:
     }
 
     void draw_text(const std::string& text, float x, float y, float font_size, const Color& color) {
-        // Simple text rendering: draw rectangles for each character
-        // TODO: Implement proper font rendering with stb_truetype
-        float char_width = font_size * 0.6f;
-        float cursor_x = x;
+        if (text.empty()) return;
 
-        for (char c : text) {
-            if (c == ' ') {
-                cursor_x += char_width * 0.5f;
-                continue;
+        // If no font loaded, use fallback rectangle rendering
+        if (!font_) {
+            float char_width = font_size * 0.6f;
+            float cursor_x = x;
+            for (char c : text) {
+                if (c == ' ') {
+                    cursor_x += char_width * 0.5f;
+                    continue;
+                }
+                Rect char_rect = {cursor_x, y, char_width, font_size};
+                draw_rect(char_rect, color);
+                cursor_x += char_width;
             }
-
-            // Draw a simple rectangle for each character
-            Rect char_rect = {cursor_x, y, char_width, font_size};
-            draw_rect(char_rect, color);
-            cursor_x += char_width;
+            return;
         }
+
+        // Use SDL_ttf for proper text rendering
+        SDL_Color sdl_color = {color.r, color.g, color.b, color.a};
+        SDL_Surface* surface = TTF_RenderUTF8_Blended(font_, text.c_str(), sdl_color);
+        if (!surface) return;
+
+        // Create OpenGL texture from surface
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // Convert to RGBA for OpenGL
+        SDL_Surface* rgba_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
+        if (rgba_surface) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rgba_surface->w, rgba_surface->h, 0,
+                        GL_RGBA, GL_UNSIGNED_BYTE, rgba_surface->pixels);
+            SDL_FreeSurface(rgba_surface);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // Render text quad
+        float r = color.rf(), g = color.gf(), b = color.bf(), a = color.af();
+        float w = (float)surface->w;
+        float h = (float)surface->h;
+
+        vertices_.push_back({x, y, r, g, b, a, 0, 0});
+        vertices_.push_back({x + w, y, r, g, b, a, 1, 0});
+        vertices_.push_back({x + w, y + h, r, g, b, a, 1, 1});
+
+        vertices_.push_back({x, y, r, g, b, a, 0, 0});
+        vertices_.push_back({x + w, y + h, r, g, b, a, 1, 1});
+        vertices_.push_back({x, y + h, r, g, b, a, 0, 1});
+
+        // Flush and render with texture
+        flush();
+
+        // Bind text texture and render
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUseProgram(shader_program_);
+        glUniform1i(use_texture_loc_, 1);
+
+        glBindVertexArray(vao_);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBufferData(GL_ARRAY_BUFFER,
+                     6 * sizeof(Vertex),
+                     &vertices_[vertices_.size() - 6],
+                     GL_DYNAMIC_DRAW);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        vertices_.resize(vertices_.size() - 6);
+
+        // Cleanup
+        glDeleteTextures(1, &texture);
+        SDL_FreeSurface(surface);
+
+        // Reset state
+        glBindTexture(GL_TEXTURE_2D, white_texture_);
+        glUniform1i(use_texture_loc_, 0);
     }
 
     void set_clip_rect(const Rect& rect) {
@@ -273,6 +355,7 @@ private:
     float screen_width_ = 1280;
     float screen_height_ = 720;
 
+    TTF_Font* font_ = nullptr;
     std::vector<Vertex> vertices_;
 };
 

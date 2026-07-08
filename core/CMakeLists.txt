@@ -21,6 +21,7 @@ target_include_directories(cui_core PUBLIC
 
 target_link_libraries(cui_core PUBLIC
     SDL2::SDL2
+    SDL2_ttf::SDL2_ttf
 )
 
 target_compile_features(cui_core PUBLIC cxx_std_23)
