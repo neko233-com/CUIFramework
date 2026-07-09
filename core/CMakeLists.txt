@@ -25,6 +25,11 @@ target_link_libraries(cui_core PUBLIC
     SDL2_ttf::SDL2_ttf
 )
 
+# cr.h requires imagehlp on Windows
+if(WIN32)
+    target_link_libraries(cui_core PUBLIC imagehlp)
+endif()
+
 target_compile_features(cui_core PUBLIC cxx_std_23)
 
 # DLL export macro for MSVC
