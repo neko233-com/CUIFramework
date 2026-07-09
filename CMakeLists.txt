@@ -98,6 +98,7 @@ FetchContent_Declare(SDL2_ttf
 )
 set(SDL2TTF_SHARED ON CACHE BOOL "Build SDL2_ttf as shared library" FORCE)
 set(SDL2TTF_STATIC OFF CACHE BOOL "Build SDL2_ttf as static library" FORCE)
+set(SDL2TTF_VENDORED ON CACHE BOOL "Use vendored freetype" FORCE)
 FetchContent_MakeAvailable(SDL2_ttf)
 
 # GLAD (OpenGL loader) — header-only, we include it directly
