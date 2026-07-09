@@ -14,6 +14,11 @@ target_link_libraries(cui_guest PRIVATE
     cui_ui
 )
 
+# cr.h requires imagehlp on Windows
+if(WIN32)
+    target_link_libraries(cui_guest PRIVATE imagehlp)
+endif()
+
 set_target_properties(cui_guest PROPERTIES
     PREFIX ""
     OUTPUT_NAME "cui_guest"
